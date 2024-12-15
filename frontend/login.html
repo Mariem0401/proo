@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 h-screen flex items-center justify-center">
+
+  <!-- Carte de Connexion -->
+  <div class="bg-white shadow-lg rounded-lg p-8 max-w-sm w-full">
+    <h1 class="text-2xl font-bold mb-6 text-center text-gray-700">Connexion</h1>
+    
+    <!-- Formulaire de Connexion -->
+    <form id="loginForm" class="space-y-4">
+      <!-- Champ Email -->
+      <div>
+        <label for="email" class="block text-sm font-medium text-gray-600">Email</label>
+        <input type="email" id="email" name="email" required 
+               class="w-full px-4 py-2 mt-1 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+               placeholder="Entrez votre email">
+      </div>
+
+      <!-- Champ Mot de Passe -->
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-600">Mot de passe</label>
+        <input type="password" id="password" name="password" required 
+               class="w-full px-4 py-2 mt-1 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+               placeholder="Entrez votre mot de passe">
+      </div>
+
+      <!-- Bouton de Soumission -->
+      <div>
+        <button type="submit" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition duration-300">
+          Se connecter
+        </button>
+      </div>
+    </form>
+
+    <!-- Mot de passe oublié -->
+    <p class="text-center mt-4 text-sm text-gray-600">
+      <a href="#" id="forgotPasswordLink" class="text-blue-600 hover:underline">Mot de passe oublié ?</a>
+    </p>
+  </div>
+
+  <!-- Modal de Réinitialisation du mot de passe -->
+  <div id="resetPasswordModal" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-6 w-full max-w-sm">
+      <h2 class="text-xl font-bold mb-4 text-center">Réinitialisation du mot de passe</h2>
+      <form id="resetPasswordForm">
+        <label for="resetEmail" class="block text-sm font-medium text-gray-600 mb-2">Votre Email</label>
+        <input type="email" id="resetEmail" name="resetEmail" required 
+               class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none" 
+               placeholder="Entrez votre email">
+        <button type="submit" 
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 mt-4 rounded-lg transition duration-300">
+          Envoyer le code
+        </button>
+      </form>
+      <button id="closeModal" class="mt-4 w-full text-center text-sm text-gray-600 hover:underline">Annuler</button>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    // Afficher le modal pour réinitialiser le mot de passe
+    const forgotPasswordLink = document.getElementById('forgotPasswordLink');
+    const resetPasswordModal = document.getElementById('resetPasswordModal');
+    const closeModal = document.getElementById('closeModal');
+
+    forgotPasswordLink.addEventListener('click', () => {
+      resetPasswordModal.classList.remove('hidden');
+    });
+
+    closeModal.addEventListener('click', () => {
+      resetPasswordModal.classList.add('hidden');
+    });
+
+    // Soumettre la demande de réinitialisation
+    document.getElementById('resetPasswordForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('resetEmail').value;
+
+      try {
+        const response = await fetch('http://localhost:7777/users/forgot-password', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 200) {
+          alert('Un code de réinitialisation a été envoyé à votre adresse email.');
+          resetPasswordModal.classList.add('hidden');
+        } else {
+          alert('Erreur : ' + data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Une erreur est survenue.');
+      }
+    });
+
+    // Soumettre le formulaire de connexion
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      try {
+        const response = await fetch('http://localhost:7777/users/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await response.json();
+
+        if (response.status === 200) {
+          alert('Connexion réussie');
+          localStorage.setItem('token', data.token);
+          window.location.href = "dashboard.html";
+        } else {
+          alert('Erreur : ' + data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Une erreur est survenue');
+      }
+    });
+  </script>
+
+</body>
+</html>

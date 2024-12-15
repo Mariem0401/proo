@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestion des Produits</title>
+  <script src="https://cdn.tailwindcss.com"></script> <!-- Inclut Tailwind CSS -->
+</head>
+<body class="bg-gray-100">
+
+  <!-- En-tête -->
+  <header class="bg-green-500 p-4 text-white text-center">
+    <h1 class="text-2xl font-bold">Gestion des Produits</h1>
+  </header>
+
+  <!-- Conteneur principal -->
+  <div class="container mx-auto p-6">
+    <!-- Formulaire d'ajout d'un produit -->
+    <h2 class="text-xl font-semibold mb-4">Ajouter un produit</h2>
+    <form id="addProductForm" class="bg-white shadow-md rounded p-6 mb-6">
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="name">Nom du produit</label>
+        <input type="text" id="name" placeholder="Nom" class="w-full p-2 border rounded">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="quantity">Quantité</label>
+        <input type="number" id="quantity" placeholder="Quantité" class="w-full p-2 border rounded">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="price">Prix</label>
+        <input type="number" id="price" placeholder="Prix" class="w-full p-2 border rounded">
+      </div>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="category">Catégorie</label>
+        <select id="category" class="w-full p-2 border rounded">
+          <option value="PC">PC</option>
+          <option value="Smartphone">Smartphone</option>
+          <option value="Smartwatch">Smartwatch</option>
+          <option value="Accessoire">Accessoire</option>
+          <option value="Autre">Autre</option>
+        </select>
+      </div>
+      <button type="submit" class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded">
+        Ajouter Produit
+      </button>
+    </form>
+
+    <!-- Liste des produits -->
+    <h2 class="text-xl font-semibold mb-4">Liste des produits</h2>
+    <table class="table-auto w-full bg-white shadow-md rounded">
+      <thead>
+        <tr class="bg-green-500 text-white">
+          <th class="px-4 py-2">Nom</th>
+          <th class="px-4 py-2">Quantité</th>
+          <th class="px-4 py-2">Prix</th>
+          <th class="px-4 py-2">Catégorie</th>
+          <th class="px-4 py-2">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productList"></tbody>
+    </table>
+  </div>
+
+  <!-- Scripts -->
+  <script>
+    const apiUrl = 'http://localhost:7777/products';
+
+    // Ajouter un produit
+    document.getElementById('addProductForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const product = {
+        name: document.getElementById('name').value,
+        quantity: document.getElementById('quantity').value,
+        price: document.getElementById('price').value,
+        category: document.getElementById('category').value,
+      };
+
+      try {
+        await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(product),
+        });
+        loadProducts();
+        e.target.reset();
+      } catch (err) {
+        console.error('Erreur lors de l’ajout du produit:', err);
+      }
+    });
+
+    // Charger les produits
+    async function loadProducts() {
+      const response = await fetch(apiUrl);
+      const data = await response.json();
+      const products = data.data.products;
+      const productList = document.getElementById('productList');
+      productList.innerHTML = '';
+      products.forEach((product) => {
+        productList.innerHTML += `
+          <tr>
+            <td class="border px-4 py-2">${product.name}</td>
+            <td class="border px-4 py-2">${product.quantity}</td>
+            <td class="border px-4 py-2">${product.price}</td>
+            <td class="border px-4 py-2">${product.category}</td>
+            <td class="border px-4 py-2">
+              <button onclick="deleteProduct('${product._id}')" class="bg-red-500 hover:bg-red-600 text-white font-bold py-1 px-2 rounded">Supprimer</button>
+            </td>
+          </tr>
+        `;
+      });
+    }
+
+    // Supprimer un produit
+    async function deleteProduct(id) {
+      try {
+        await fetch(`${apiUrl}/${id}`, { method: 'DELETE' });
+        loadProducts();
+      } catch (err) {
+        console.error('Erreur lors de la suppression:', err);
+      }
+    }
+
+    // Charger les produits au démarrage
+    loadProducts();
+  </script>
+</body>
+</html>
