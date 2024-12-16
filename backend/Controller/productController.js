@@ -16,6 +16,7 @@ exports.createProduct = async (req, res) => {
   }
 };
 // retourner tous les produits 
+// http://localhost:7777/products/
 exports.getAllProducts = async (req, res) => {
     try {
       // Si une catégorie est spécifiée dans la requête, on filtre les produits par catégorie
@@ -43,7 +44,7 @@ exports.getAllProducts = async (req, res) => {
     }
   };
   
-
+// http://localhost:7777/products/67585e1cd7355e32f39330e3
 exports.getProductById = async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -64,8 +65,9 @@ exports.getProductById = async (req, res) => {
     });
   }
 };
-
-// Mettre à jour un produit
+ 
+// Mettre à jour un produit   
+// url postman : http://localhost:7777/products/67585e1cd7355e32f39330e3
 exports.updateProduct = async (req, res) => {
   try {
     const updatedProduct = await Product.findByIdAndUpdate(
@@ -92,6 +94,7 @@ exports.updateProduct = async (req, res) => {
 };
 
 // Supprimer un produit
+// url : http://localhost:7777/products/67585e1cd7355e32f39330e6   je dois connecter en tant que admin tout d'abord 
 exports.deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);

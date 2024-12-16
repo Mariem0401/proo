@@ -9,6 +9,7 @@ const path = require('path'); // Importer path pour gérer les chemins
 
 const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
+const panierRoutes = require("./routes/panierRoutes");
 // Middleware pour parser les requêtes JSON
 App.use(express.json());
 
@@ -23,6 +24,7 @@ App.listen(port,()=>{
 ); 
 App.use('/users', userRoutes);
 App.use("/products", productRoutes);
+App.use("/Cart", panierRoutes);
 // connect to the data base 
 const DB = process.env.DATABASE.replace("<db_password>",process.env.DATABASE_PASSWORD);
 mongoose

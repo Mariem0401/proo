@@ -1,0 +1,20 @@
+
+const express = require('express');
+const {
+  addToCart,
+  updateCart,
+  removeCartItem,
+  getCart,
+  clearCart,
+} = require('../Controller/panierController');
+const { protectionMW } = require('../Controller/authController');
+
+const router = express.Router();
+
+// Protéger les routes du panier pour les utilisateurs connectés
+router.use(protectionMW);
+
+router.route('/').get(getCart).post(addToCart).delete(clearCart);
+router.route('/:productId').patch(updateCart).delete(removeCartItem);
+
+module.exports = router;
